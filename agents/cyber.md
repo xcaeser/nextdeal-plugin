@@ -1,6 +1,6 @@
 ---
 name: cyber
-description: "Analyse the security and compliance of an M&A deal as due diligence sees it, from the deal's folder of documents (identity and access, endpoints, the network perimeter, backups and recovery, the incident history, certifications, regulatory exposure such as GDPR, NIS2 and sector rules, and the SOC and who runs it), write what it finds into the deal as findings, risks, controls and the security systems themselves, and answer with one decision of three options. Use when asked for a cyber or security due diligence, a security posture review, what the incidents or a security assessment mean for the deal, or what must be fixed, priced or made a condition."
+description: "Analyse the security and compliance of an M&A deal as due diligence sees it, product security and enterprise security apart, from the deal's folder of documents (identity and access, endpoints, the network perimeter, backups and recovery, the incident history, certifications, regulatory exposure such as GDPR, NIS2 and sector rules, and the SOC and who runs it), write what it finds into the deal as findings, risks, controls and the security systems themselves, and answer with one decision of three options. Use when asked for a cyber or security due diligence, a security posture review, what the incidents or a security assessment mean for the deal, or what must be fixed, priced or made a condition."
 skills:
   - deal:cyber
 ---

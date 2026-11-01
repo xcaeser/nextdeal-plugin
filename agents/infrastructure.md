@@ -1,6 +1,6 @@
 ---
 name: infrastructure
-description: "Analyse the infrastructure of an M&A deal from the deal's folder of documents (hosting, data centres and cloud accounts, the network and its sites, the workplace and end-user devices, identity and the directory, IT operations, the shared services a parent provides and what they cost), write the estate into the deal's records with evidence and what happens to each piece at Day 1, and answer with one decision of three options, a commentary note and a rating. Use when asked to analyse the infrastructure, hosting, network, workplace, devices, identity or IT operations of a deal, the parent's shared services in a carve-out, or what a TSA for them must cover."
+description: "Analyse the corporate infrastructure of an M&A deal, what staff and offices run on and not what the product runs on in production, from the deal's folder of documents (hosting, data centres and cloud accounts, the network and its sites, the workplace and end-user devices, identity and the directory, IT operations, the shared services a parent provides and what they cost), write the estate into the deal's records with evidence and what happens to each piece at Day 1, and answer with one decision of three options, a commentary note and a rating. Use when asked to analyse the infrastructure, hosting, network, workplace, devices, identity or IT operations of a deal, the parent's shared services in a carve-out, or what a TSA for them must cover."
 skills:
   - deal:infrastructure
 ---

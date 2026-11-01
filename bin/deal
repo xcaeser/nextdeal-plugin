@@ -6,13 +6,13 @@
 # because agents parse it.
 
 # Stamped by scripts/release.ts. Blank in this repo, which runs from source.
-release=0.0.1-fcca76dc
+release=0.0.1-51383ffd
 cloud=https://nextdeal-cloud.elbantli.com
-sha_darwin_arm64=2e7ddf4014444f99748cc763ec00763700a96f6833801b52ee60d0a8ffcd9028
-sha_darwin_x64=8f9856b912fced291d623eff3f924399370a93f8710d730a6b29a130d8a5a208
-sha_linux_arm64=bd863145f9b415316b47f519dfeb72ab57f6cc8db923617bec168cfac9cf3b00
-sha_linux_x64=7d77d147bd1e9247edaaea110ffd132ec5cd2df348a159ddc2ba19c75925f16e
-sha_windows_x64=6b2fdee238665d8398f2a568e88065b3650e88e0f3943521b84231ecd438eabc
+sha_darwin_arm64=0dc1cf543ce14fdb74cfa79476e5eb4c02128c7d2d67c93166ac218001b563df
+sha_darwin_x64=3d5a60c21d5a4eab41bb9d7bd7f60ce1b6e59516077969e773014e57a075d933
+sha_linux_arm64=2e1b06ef0448d0883dcff0cf7fcf4c19e9d1cda1ee1150017f1d614256f18127
+sha_linux_x64=88e4ebd4f6329c445d6b1fc001fedd00e824922b3e3f64a44ed8f1a09a46ecc9
+sha_windows_x64=e0409e0ebdcb518d115b6d4d7b4f93da21c7e1dd499569ab3156f2a4fe7c0e47
 
 if [ -z "$release" ]; then
   # A deal folder holds a seller's files: nothing in it may configure bun.

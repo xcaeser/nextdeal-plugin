@@ -1,6 +1,6 @@
 ---
 name: people-and-org
-description: "Analyse the people and organisation of an M&A deal from the deal's folder of documents (FTEs, headcount, the IT organisation, people cost, who transfers at Day 1, key-person risk), write the organisation chart and who goes where at Day 1 into the deal and answer with one decision of three options. Use when asked to analyse FTEs, headcount, the IT organisation, people cost, the org chart or the transfer of employees in a deal."
+description: "Analyse the people and organisation of an M&A deal from the deal's folder of documents (FTEs, headcount, engineering and the IT organisation apart, people cost, who transfers at Day 1, key-person risk), write the organisation chart and who goes where at Day 1 into the deal and answer with one decision of three options. Use when asked to analyse FTEs, headcount, the IT organisation, people cost, the org chart or the transfer of employees in a deal."
 skills:
   - deal:people-and-org
 ---
