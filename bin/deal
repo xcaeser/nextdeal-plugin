@@ -1,0 +1,131 @@
+#!/bin/sh
+# The plugin's one program, holding no code of ours. The first run fetches the
+# compiled CLI for this machine and every later run goes straight to it. What it
+# fetches must match a hash pinned here at release, so a compromised download
+# host cannot run anything on this machine. Stdout belongs to the CLI alone,
+# because agents parse it.
+
+# Stamped by scripts/release.ts. Blank in this repo, which runs from source.
+release=0.0.1-0d4d996b
+cloud=https://nextdeal-cloud.elbantli.com
+sha_darwin_arm64=ed70e908154f78904854cb91debe1ebdfa89eac0337ccbd9c06d37fae78ba060
+sha_darwin_x64=37f8080026e45754f896841d9d95bef3f4b8234faca279736796b32bbf62ffdd
+sha_linux_arm64=86e39f70ee537836af00ef3082f5d998ab54879089da0494423b2c20815d1d8d
+sha_linux_x64=024d42f78a644ba4df31fbd026994dba30fd6d027e1bd114c23a057433b58dbe
+sha_windows_x64=95a72628a51600f727ee9c2393f66e18f33072f19819a68259b20f03668ec083
+
+if [ -z "$release" ]; then
+  # A deal folder holds a seller's files: nothing in it may configure bun.
+  root="$(dirname "$0")/.."
+  DEAL_PACK="${DEAL_PACK-$root/dist/pack}" exec bun --no-env-file --config=/dev/null "$root/src/cli/main.ts" "$@"
+fi
+
+refuse() {
+  printf '{"ok":false,"error":"%s","hint":"%s"}\n' "$1" "$2" >&2
+  exit 1
+}
+
+sha_for_this_machine() {
+  case $(uname -s) in
+    Darwin) os=darwin ;;
+    Linux) os=linux ;;
+    MINGW* | MSYS* | CYGWIN*) os=windows ;;
+    *) os=$(uname -s) ;;
+  esac
+  case $(uname -m) in
+    arm64 | aarch64) arch=arm64 ;;
+    x86_64 | amd64) arch=x64 ;;
+    *) arch=$(uname -m) ;;
+  esac
+  # Under Rosetta an Apple silicon Mac reports Intel; the native build is quicker.
+  if [ "$os-$arch" = darwin-x64 ] && [ "$(sysctl -n sysctl.proc_translated 2>/dev/null)" = 1 ]; then
+    arch=arm64
+  fi
+  case $os-$arch in
+    darwin-arm64) sha=$sha_darwin_arm64 ;;
+    darwin-x64) sha=$sha_darwin_x64 ;;
+    linux-arm64) sha=$sha_linux_arm64 ;;
+    linux-x64) sha=$sha_linux_x64 ;;
+    # Windows on Arm runs the Intel build under emulation.
+    windows-*) sha=$sha_windows_x64 ;;
+    *) refuse "No deal CLI for $os on $arch" "Use macOS, Windows, or glibc Linux on x64 or arm64" ;;
+  esac
+}
+
+install() {
+  if [ -n "${CODEX_SANDBOX_NETWORK_DISABLED:-}" ]; then
+    refuse "The deal CLI is not installed yet" "Run this same command again outside the sandbox, with the user's approval: the first run needs the network and writes to ~/.deal"
+  fi
+  sha_for_this_machine
+  if command -v sha256sum >/dev/null 2>&1; then
+    hasher='sha256sum'
+  elif command -v shasum >/dev/null 2>&1; then
+    hasher='shasum -a 256'
+  elif command -v openssl >/dev/null 2>&1; then
+    hasher='openssl dgst -sha256 -r'
+  else
+    refuse "Nothing here can check the download, so it was not fetched" "Install sha256sum, shasum or openssl, then run the command again"
+  fi
+  if command -v curl >/dev/null 2>&1; then
+    fetch='curl -fsSL --connect-timeout 15 --max-time 600 --retry 2 -o'
+  elif command -v wget >/dev/null 2>&1; then
+    fetch='wget -q -T 30 -O'
+  else
+    refuse "Neither curl nor wget is here to fetch the deal CLI" "Install curl, then run the command again"
+  fi
+
+  dir=$(dirname "$bin")
+  mkdir -p "$dir" || refuse "Cannot write the deal CLI's folder" "Make ~/.deal writable, then run the command again"
+  # A run killed part way leaves its folder behind; a live one is under an hour.
+  find "$dir" -name '.part-*' -mmin +60 -exec rm -rf {} + 2>/dev/null
+  # Each run works alone and arrives by one rename, so parallel first runs
+  # cannot see a partial file, and a crash in one cannot block the rest.
+  part=$dir/.part-$$
+  trap 'rm -rf "$part"' EXIT
+  trap 'exit 1' HUP INT TERM
+  mkdir -p "$part" || refuse "Cannot write the deal CLI's folder" "Make ~/.deal writable, then run the command again"
+
+  # shellcheck disable=SC2086 # Each holds a command and its flags.
+  $fetch "$part/deal.tar.gz" "$cloud/v1/cli/$sha.tar.gz" >/dev/null 2>&1 ||
+    refuse "Could not fetch the deal CLI from $cloud" "Check the connection, or ask IT to allow that address, then run the command again"
+  # shellcheck disable=SC2086
+  got=$($hasher "$part/deal.tar.gz" | cut -d' ' -f1)
+  [ "$got" = "$sha" ] ||
+    refuse "The download does not match this release, so it was not run" "Run the command again. If this repeats, tell the publisher: something changed the file on its way here"
+  tar -xzf "$part/deal.tar.gz" -C "$part" >/dev/null 2>&1 ||
+    refuse "The download could not be unpacked" "Run the command again"
+  chmod +x "$part/$program" && mv -f "$part/$program" "$bin" ||
+    refuse "Cannot write the deal CLI's folder" "Make ~/.deal writable, then run the command again"
+  rm -rf "$part"
+  trap - EXIT
+
+  # Three stay: a login item can name an older one until its deal next runs.
+  ls -1t "$home/cli" | tail -n +4 | while IFS= read -r old; do
+    rm -rf "${home:?}/cli/$old"
+  done
+}
+
+# Codex plugins cannot ship agents, so they go where Codex reads them, and it
+# picks them up in the next session. Best effort: the CLI works without them.
+install_codex_agents() {
+  from=$(dirname "$0")/../codex-agents
+  mkdir -p "$agents" 2>/dev/null &&
+    rm -f "$agents"/deal-*.toml "$agents"/.deal-* 2>/dev/null &&
+    cp "$from"/*.toml "$agents/" 2>/dev/null &&
+    : >"$agents/.deal-$release"
+}
+
+# Git Bash runs this file on Windows, where the archive holds deal.exe.
+case ${OS:-} in
+  Windows_NT) program=deal.exe ;;
+  *) program=deal ;;
+esac
+home=${DEAL_HOME:-${HOME:-}/.deal}
+bin=$home/cli/$release/$program
+agents=${CODEX_HOME:-${HOME:-}/.codex}/agents
+
+# No program runs on this path once installed: the app answers within a blink
+# of a command, and starting the shell is already most of the cost.
+[ -x "$bin" ] || install
+[ -z "${CODEX_THREAD_ID:-}" ] || [ -e "$agents/.deal-$release" ] || install_codex_agents
+exec "$bin" "$@"

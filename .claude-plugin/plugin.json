@@ -1,0 +1,9 @@
+{
+  "name": "deal",
+  "displayName": "nextdeal",
+  "description": "A technology M&A consultant as skills and tools: an engagement lead, specialists by dimension, and a red team, working on a deal folder through evidenced records.",
+  "author": {
+    "name": "nextdeal"
+  },
+  "version": "0.0.1-0d4d996b"
+}
