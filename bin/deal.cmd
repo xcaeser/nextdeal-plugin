@@ -8,9 +8,9 @@ rem holds a seller's files.
 setlocal DisableDelayedExpansion
 
 rem Stamped by scripts/release.ts.
-set "release=0.0.1-0d4d996b"
+set "release=0.0.1-c1cff56b"
 set "cloud=https://nextdeal-cloud.elbantli.com"
-set "sha_windows_x64=95a72628a51600f727ee9c2393f66e18f33072f19819a68259b20f03668ec083"
+set "sha_windows_x64=7484ebde7d62de497ffac66bc8cd0b5c56a18634ec0bfd5464ee944fbfd7af18"
 
 if defined release goto stamped
 echo {"ok":false,"error":"This deal.cmd has no release stamped in it","hint":"Install the plugin from its marketplace"} 1>&2
